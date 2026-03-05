@@ -1,0 +1,21 @@
+# Core Data & ML
+pandas
+numpy
+scikit-learn
+scipy
+joblib
+
+# F1 Data Ingestion
+fastf1
+
+# Frontend & Visualization
+streamlit
+plotly
+
+# MLOps & Tracking
+mlflow
+dagshub
+python-dotenv
+
+# Cloud & Infrastructure
+boto3

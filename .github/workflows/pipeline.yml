@@ -1,0 +1,51 @@
+name: F1 MLOps Automated Pipeline
+
+on:
+  # 1. Runs automatically every Monday morning after race weekends
+  schedule:
+    - cron: '0 9 * * 1' 
+  # 2. Runs whenever you push new code to the main branch
+  push:
+    branches:
+      - main
+  # 3. Allows you to manually click "Run workflow" in the GitHub UI
+  workflow_dispatch: 
+
+jobs:
+  run-ml-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🏁 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚡ Install uv (The Rust-based speed upgrade)
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "requirements.txt"
+
+      - name: 🐍 Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: 📦 Install Dependencies
+        # Using uv to create a virtual environment and install dependencies instantly
+        run: |
+          uv venv
+          uv pip install -r requirements.txt
+
+      - name: 🚀 Run MLOps Pipeline (Ingest, Drift, Train, Promote)
+        env:
+          # Pulling credentials securely from GitHub Secrets
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          DAGSHUB_REPO_OWNER: ${{ secrets.DAGSHUB_REPO_OWNER }}
+          DAGSHUB_REPO_NAME: ${{ secrets.DAGSHUB_REPO_NAME }}
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          # The fix for the ModuleNotFoundError we hit earlier!
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          # Activate the uv virtual environment and run the master script
+          source .venv/bin/activate
+          python src/model.py
