@@ -17,16 +17,21 @@ from challenger import evaluate_challenger
 # Load environment variables for AWS and DagsHub
 load_dotenv()
 
-# --- ENTERPRISE MLOPS: REMOTE REGISTRY SETUP ---
-if os.getenv("DAGSHUB_TOKEN"):
-    os.environ["DAGSHUB_USER_TOKEN"] = os.getenv("DAGSHUB_TOKEN")
+repo_owner = os.getenv("DAGSHUB_REPO_OWNER")
+repo_name = os.getenv("DAGSHUB_REPO_NAME")
+token = os.getenv("DAGSHUB_TOKEN")
 
-# Now initialize without the extra 'token' argument
-dagshub.init(
-    repo_owner=os.getenv("DAGSHUB_REPO_OWNER"),
-    repo_name=os.getenv("DAGSHUB_REPO_NAME"),
-    mlflow=True,
-)
+if token and repo_owner and repo_name:
+    # Set the remote tracking URI directly
+    tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+    mlflow.set_tracking_uri(tracking_uri)
+
+    # Manually inject the credentials into the environment for the MLflow client
+    os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
+    os.environ["MLFLOW_TRACKING_PASSWORD"] = token
+    print(f"📡 Remote MLflow Tracking initialized: {repo_name}")
+else:
+    print("⚠️ Local MLflow Tracking (Credentials missing)")
 
 
 def train_anomaly_detector(df, event_name):
