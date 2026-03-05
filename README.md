@@ -2,7 +2,7 @@
 title: F1-2026-Apex-Guardian
 emoji: 🏎️
 colorFrom: red
-colorTo: black
+colorTo: gray
 sdk: streamlit
 sdk_version: 1.42.0
 app_file: app.py
