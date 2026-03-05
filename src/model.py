@@ -18,10 +18,13 @@ from challenger import evaluate_challenger
 load_dotenv()
 
 # --- ENTERPRISE MLOPS: REMOTE REGISTRY SETUP ---
+if os.getenv("DAGSHUB_TOKEN"):
+    os.environ["DAGSHUB_USER_TOKEN"] = os.getenv("DAGSHUB_TOKEN")
+
+# Now initialize without the extra 'token' argument
 dagshub.init(
     repo_owner=os.getenv("DAGSHUB_REPO_OWNER"),
     repo_name=os.getenv("DAGSHUB_REPO_NAME"),
-    token=os.getenv("DAGSHUB_TOKEN"),  # ADD THIS LINE
     mlflow=True,
 )
 
