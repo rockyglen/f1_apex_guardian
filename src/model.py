@@ -21,6 +21,7 @@ load_dotenv()
 dagshub.init(
     repo_owner=os.getenv("DAGSHUB_REPO_OWNER"),
     repo_name=os.getenv("DAGSHUB_REPO_NAME"),
+    token=os.getenv("DAGSHUB_TOKEN"),  # ADD THIS LINE
     mlflow=True,
 )
 
