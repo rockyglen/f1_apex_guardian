@@ -91,9 +91,7 @@ def train_anomaly_detector(df, event_name):
         joblib.dump(model, local_model_path)
 
         # S3 Production Upload
-        s3.s3.upload_file(
-            local_model_path, s3.bucket, "production/thermal_detector.pkl"
-        )
+        s3.upload_model(local_model_path)
         print("🚀 Champion model uploaded to S3 Production folder.")
 
         # Log to DagsHub Artifacts
