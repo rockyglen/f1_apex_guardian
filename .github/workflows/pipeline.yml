@@ -4,10 +4,7 @@ on:
   # 1. Runs automatically every Monday morning after race weekends
   schedule:
     - cron: '0 9 * * 1' 
-  # 2. Runs whenever you push new code to the main branch
-  push:
-    branches:
-      - main
+  
   # 3. Allows you to manually click "Run workflow" in the GitHub UI
   workflow_dispatch: 
 
