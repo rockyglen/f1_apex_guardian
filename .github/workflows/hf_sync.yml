@@ -3,6 +3,7 @@ name: Sync to Hugging Face Hub
 on:
   push:
     branches: [main]
+  # Allows you to manually trigger the sync from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -12,24 +13,28 @@ jobs:
       - name: 🏁 Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # We pull history locally but we will prune it for HF
+          fetch-depth: 0 # Pull history locally for context
 
-      - name: 🚀 Push to Hub (Clean Sweep)
+      - name: 🚀 Push to Hub (Clean Production Build)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # 1. Kill the local .git history in the runner so the 'ghost' files vanish
+          # 1. Kill the local .git folder to strip out 'mlflow.db' from history
           rm -rf .git
           
-          # 2. Re-initialize a brand new, temporary Git repo
-          git init
+          # 2. Re-initialize a fresh, temporary repo explicitly named 'main'
+          git init -b main
+          
+          # 3. Configure the temporary git user for the commit
           git config user.name "glen-louis"
           git config user.email "glen-louis@users.noreply.github.com"
           
-          # 3. Add ONLY the current files (Respects your .gitignore)
+          # 4. Add all current files (Respecting your .gitignore)
           git add .
+          
+          # 5. Create a clean production commit
           git commit -m "deploy: clean production build for Hugging Face"
           
-          # 4. Force push this 'clean' snapshot to the Space
-          # Note: Replace 'glen-louis' and the Space name if they differ
+          # 6. Force push the fresh 'main' branch to the Space
+          # Replace 'glen-louis' and the Space name if they differ in your HF URL
           git push --force https://glen-louis:$HF_TOKEN@huggingface.co/spaces/glen-louis/F1-2026-Apex-Guardian main
